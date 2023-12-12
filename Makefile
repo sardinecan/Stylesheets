@@ -7,7 +7,7 @@ SAXON_ARGS=-ext:on
 DIRS=bibtex cocoa common csv docx dtd docbook epub epub3 fo html wordpress markdown html5 json latex latex nlm odd odds odt p4 pdf profiles/default rdf rng rnc schematron simple slides tbx tcp lite tite tools txt html xsd xlsx pdf verbatimxml
 
 SCRIPTS=bin/*to*
-PREFIX=/usr
+PREFIX=/tmp/tei
 OXY=/usr/share/oxygen
 DOCTARGETS= \
 	latex/latex.xsl \
@@ -130,10 +130,10 @@ installxsl: build teioo.jar
 	mkdir -p ${PREFIX}/share/xml/tei/stylesheet ${PREFIX}/bin ${PREFIX}/source
 	(tar cf - lib teioo.jar) | (cd ${PREFIX}/share/xml/tei/stylesheet; tar xf - )
 	(cd release/xsl; tar cf - .) | (cd ${PREFIX}/share; tar xf  -)
-	cp --preserve=timestamps bin/transformtei ${PREFIX}/bin
-	cp --preserve=timestamps source/p5subset.xml ${PREFIX}/source
+	cp -p bin/transformtei ${PREFIX}/bin
+	cp -p source/p5subset.xml ${PREFIX}/source
         # Shouldn't the "/usr" in the following line be ${PREFIX} ? —Syd & Martin, 2020-07-03
-	perl -p -i -e 's+^APPHOME=.*+APPHOME=/usr/share/xml/tei/stylesheet+' ${PREFIX}/bin/transformtei
+	perl -p -i -e 's+^APPHOME=.*+APPHOME=${PREFIX}/share/xml/tei/stylesheet+' ${PREFIX}/bin/transformtei
 	chmod 755 ${PREFIX}/bin/transformtei
 	for i in $(SCRIPTS); do  (cd ${PREFIX}/bin; rm -f `basename $$i`;  ln -s transformtei `basename $$i`); done
 
