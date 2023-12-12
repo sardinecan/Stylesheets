@@ -10,7 +10,11 @@
    
    <xsl:import href="../../default/docx/from.xsl"/>
    
+   <xsl:template match="/">
+      <xsl:apply-templates/>
+   </xsl:template>
+   
    <xsl:template match="*[local-name()='p'][normalize-space(.)='']">
-      <space/>
+      <xsl:text>tructruc</xsl:text>
    </xsl:template>
 </xsl:stylesheet>
