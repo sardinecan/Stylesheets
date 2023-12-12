@@ -8,6 +8,9 @@
    exclude-result-prefixes="xs w"
    version="2.0">
    
-   <xsl:import href="../"/>
+   <xsl:import href="../../default/docx/from.xsl"/>
    
+   <xsl:template match="*[local-name()='p'][normalize-space(.)='']">
+      <space/>
+   </xsl:template>
 </xsl:stylesheet>
