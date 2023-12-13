@@ -5,7 +5,8 @@
    xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml"
    xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
    xmlns="http://www.tei-c.org/ns/1.0"
-   exclude-result-prefixes="xs w"
+   xmlns:tei="http://www.tei-c.org/ns/1.0"
+   exclude-result-prefixes="#all"
    version="2.0">
    
    <xsl:import href="../../default/docx/from.xsl"/>
@@ -14,7 +15,9 @@
       <xsl:apply-templates/>
    </xsl:template>
    
-   <xsl:template match="*[local-name()='p'][normalize-space(.)='']">
-      <xsl:text>tructruc</xsl:text>
+   <xsl:template match="*[local-name()='t'][normalize-space(.)='']">
+      <xsl:copy>
+         <xsl:text>séparation</xsl:text>
+      </xsl:copy>
    </xsl:template>
 </xsl:stylesheet>
