@@ -91,5 +91,8 @@
     <xsl:template match="tei:hi[@rend='Aucun']"><xsl:copy-of select="node()"/></xsl:template>
     
     <xsl:template match="@style" mode="pass2"/>
-    <xsl:template match="@rend[.='Normal']" mode="pass2"/>
+    <xsl:template match="tei:p/@rend" mode="pass2"/>
+    <xsl:template match="tei:note" mode="pass2"/>
+    <xsl:template match="tei:hi[@rend='Caractères_de_note_de_bas_de_page_Ancre_de_note_de_bas_de_page']" mode="pass2"/>
+    
 </xsl:stylesheet>
