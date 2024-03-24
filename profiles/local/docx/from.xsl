@@ -11,13 +11,19 @@
    
    <xsl:import href="../../default/docx/from.xsl"/>
    
+   <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
+   
    <xsl:template match="/">
       <xsl:apply-templates/>
    </xsl:template>
    
-   <xsl:template match="*[local-name()='t'][normalize-space(.)='']">
-      <xsl:copy>
+   <xsl:template match="*[local-name()='t'][normalize-space(.)=''][ancestor::w:p[normalize-space(.)='']]">
+      <!--<xsl:copy>
          <xsl:text>séparation</xsl:text>
-      </xsl:copy>
+      </xsl:copy>-->
+      <xsl:comment>séparation</xsl:comment>
    </xsl:template>
+   
+   <!-- la modification du template au-dessus induit le maintien des bookmarks -->
+   <xsl:template match="w:bookmarkStart"/>
 </xsl:stylesheet>
