@@ -118,7 +118,43 @@ of this software, even if advised of the possibility of such damage.
   </d:doc>
   <xsl:output encoding="UTF-8" indent="yes" method="xml"/>
   <xsl:param name="verbose" select="'false'"/>
-  <xsl:param name="lang" select="'en'"/>
+  <xsl:variable name="root" select="/"/>
+  <d:doc>
+    <d:desc>The parameter $lang is the language tag for which we will extract
+      constraints (ignoring constraints in other languages). To determine a
+      default we check to see what language(s) the constraints are in. If there
+      is only 1, that is the default. If there are none we presume "en". If
+      there are more than 1, throw an error, advising the user that $lang has
+      to be specified.</d:desc>
+    <!-- WARNING to Syd — comment above no longer matches code below, but since
+    I think I want to re-write whole thing so that CONSTRAINTs is a key that uses
+    langauge, not 1 … -->
+  </d:doc>
+  <xsl:param name="lang">
+    <xsl:variable name="languages" select="distinct-values( //@xml:lang )"/>
+    <xsl:variable name="constraint_languages" as="xs:string*">
+      <xsl:for-each select="key('CONSTRAINTs', $languages, $root ) | key('SCHQCKFIXs', $languages, $root )">
+        <xsl:sequence select="( ./ancestor-or-self::*[@xml:lang][1]/@xml:lang, 'en')[1] "/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name="distinct_constraint_languages" select="distinct-values( $constraint_languages )"/>
+    <xsl:choose>
+      <xsl:when test="count( $distinct_constraint_languages ) eq 0">
+        <xsl:message terminate="yes">Internal fatal ERROR: Unable to determine the language (i.e., @xml:lang) of any constraints.</xsl:message>
+      </xsl:when>
+      <xsl:when test="count( $distinct_constraint_languages ) eq 1">
+        <xsl:sequence select="$distinct_constraint_languages"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:message terminate="yes"
+                     select="'ERROR: constraints present in '
+                            ||count($distinct_constraint_languages)
+                            ||' different languages ('
+                            ||string-join( $distinct_constraint_languages, ', ')
+                            ||') but no language to process specified. (Set $lang parameter, e.g. with --lang switch.)'"/>
+      </xsl:otherwise>
+    </xsl:choose>      
+  </xsl:param>
   <d:doc>
     <d:desc>For the prefix for prefixes the default “esp” stands for
      “Extract Schematron Prefix”. Silly, I know, but my first thought
@@ -129,17 +165,22 @@ of this software, even if advised of the possibility of such damage.
   <xsl:param name="teix-ns" select="'http://www.tei-c.org/ns/Examples'"/>
   <xsl:variable name="xsl-ns">http://www.w3.org/1999/XSL/Transform</xsl:variable>
   
+  <xsl:mode on-no-match="shallow-copy" />
   <xsl:mode on-no-match="shallow-copy" name="copy"/>
   <xsl:mode on-no-match="shallow-copy" name="NSdecoration"/>
   
   <d:doc>
     <d:desc>Note on keys: should not really need the "[not(ancestor::teix:egXML)]"
-    predicate on DEPRECATEDs and CONSTRAINTs, as the elements matched (tei:* and
-    constraintSpec/constraint, respectively) should never be inside a &lt;teix:egXML>.</d:desc>
+    predicate on DEPRECATEDs, CONSTRAINTs, and SCHQCKFIXs, as the elements matched
+    (tei:*, tei:constraintSpec/tei:constraint, and tei:constraintSpec//sqf:fixes,
+    respectively) should never be inside a &lt;teix:egXML>.</d:desc>
   </d:doc>
   <xsl:key name="DECLARED_NSs" 
-           match="sch:ns[ not( ancestor::teix:egXML ) ]"
-           use="1"/>
+           match="constraintDecl//sch:ns[ not( ancestor::teix:egXML ) ]"
+           use="'*'"/>  
+  <xsl:key name="DECLARED_NSs" 
+           match="constraintSpec[ @scheme eq 'schematron']/constraint//sch:ns[ not( ancestor::teix:egXML ) ]"
+           use="( ancestor-or-self::*[@xml:lang][1]/@xml:lang, 'en')[1] => normalize-space()"/>
   
   <xsl:key name="KEYs" 
            match="xsl:key[ not( ancestor::teix:egXML ) ]"
@@ -154,10 +195,15 @@ of this software, even if advised of the possibility of such damage.
            use="1"/>
 
   <xsl:key name="CONSTRAINTs"
-           match="constraint[ parent::constraintSpec[ @scheme = ('isoschematron','schematron') ] ]
-                            [ not( ancestor::teix:egXML )]"
-           use="1"/>
+           match="constraintSpec[ @scheme eq 'schematron' ]/constraint
+                                [ not( ancestor::teix:egXML ) ]"
+           use="( ancestor-or-self::*[@xml:lang][1]/@xml:lang, 'en')[1] => normalize-space()"/>
 
+  <xsl:key name="SCHQCKFIXs"
+           match="constraintSpec[ @scheme eq 'schematron' ]//sqf:fixes
+                                [ not( ancestor::teix:egXML ) ]"
+           use="( ancestor-or-self::*[@xml:lang][1]/@xml:lang, 'en')[1] => normalize-space()"/>
+  
   <xsl:template match="/">
     <!-- first, decorate tree with namespace info; also add an @xml:lang to -->
     <!-- the outermost element iff needed. -->
@@ -171,20 +217,7 @@ of this software, even if advised of the possibility of such damage.
     <!-- Note: to see decorated tree for debugging, change mode of above -->
     <!-- from "schematron-extraction" to "copy". -->
   </xsl:template>
-
-  <d:doc>
-    <d:desc>First pass ... outermost element gets a new @xml:lang iff it doesn't
-    have one already</d:desc>
-  </d:doc>
-  <xsl:template match="/*" mode="NSdecoration">
-    <xsl:copy>
-      <xsl:apply-templates select="@* except @xml:lang" mode="#current"/>
-      <xsl:attribute name="xml:lang" select="$lang"/>
-      <xsl:apply-templates select="@xml:lang" mode="#current"/>
-      <xsl:apply-templates select="node()" mode="#current"/>
-    </xsl:copy>
-  </xsl:template>
-  
+ 
   <d:doc>
     <d:desc>First pass ... elements that might have an ns= attribute
     get new nsu= (namespace URI) and nsp= (namespace prefix) attributes</d:desc>
@@ -203,17 +236,22 @@ of this software, even if advised of the possibility of such damage.
         </xsl:choose>
       </xsl:variable>
       <xsl:attribute name="nsp">
+        <xsl:variable name="DECLARED_NSs_with_this_uri" as="element(sch:ns)*"
+                      select="key('DECLARED_NSs', ( '*', $lang ), $root )[@uri eq $nsu]"/>
         <xsl:choose>
           <xsl:when test="$nsu eq ''"/>
           <xsl:when test="$nsu eq $tei-ns">tei:</xsl:when>
           <xsl:when test="$nsu eq $teix-ns">teix:</xsl:when>
-          <xsl:when test="ancestor-or-self::tei:schemaSpec//sch:ns[@uri eq $nsu]">
-            <!--
-              Oops ... what *should* we do in following XPath if there's more than 1? Just taking
-              taking the first seems lame, but I can't think of what else we might do right now.
-                 —Syd, 2014-07-23
-            -->
-            <xsl:value-of select="concat( ancestor-or-self::tei:schemaSpec//sch:ns[@uri eq $nsu][1]/@prefix, ':')"/>
+          <xsl:when test="$DECLARED_NSs_with_this_uri">
+            <xsl:if test="count( $DECLARED_NSs_with_this_uri ) gt 1">
+              <xsl:message select="'WARNING: there are '
+                                  ||count( $DECLARED_NSs_with_this_uri )
+                                  ||' &lt;sch:ns> elements that have an @uri of '
+                                  ||$nsu
+                                  ||'; using the prefix bound in the first one, '
+                                  ||'and ignoring the other(s).'"/>
+            </xsl:if>
+            <xsl:sequence select="$DECLARED_NSs_with_this_uri/@prefix => normalize-space()||':'"/>
           </xsl:when>
           <xsl:when test="namespace::* = $nsu">
             <xsl:value-of select="concat( local-name( namespace::*[ . eq $nsu ][1] ), ':')"/>
@@ -238,71 +276,72 @@ of this software, even if advised of the possibility of such damage.
       <title>ISO Schematron rules</title>
       <xsl:comment> This file generated <xsl:sequence select="tei:whatsTheDate()"/> by 'extract-isosch.xsl'. </xsl:comment>
 
-      <xsl:call-template name="blockComment">
-        <xsl:with-param name="content" select="'namespaces, declared:'"/>
-      </xsl:call-template>
-      <xsl:for-each select="key('DECLARED_NSs',1)">
-        <xsl:choose>
-          <xsl:when test="not( lang( $lang ) )"/>
-          <xsl:when test="@prefix = 'xsl'"/>
-          <xsl:otherwise>
-            <ns><xsl:apply-templates select="@*|node()" mode="copy"/></ns>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
+      <xsl:if test="key('DECLARED_NSs', ( '*', $lang ), $root )[ not( @prefix eq 'xsl') ]">
+        <xsl:call-template name="blockComment">
+          <xsl:with-param name="content" select="'namespaces, declared:'"/>
+        </xsl:call-template>
+        <xsl:for-each select="key('DECLARED_NSs', ( '*', $lang ), $root )[ not( @prefix eq 'xsl') ]">
+          <ns><xsl:apply-templates select="@*|node()" mode="copy"/></ns>
+        </xsl:for-each>
+      </xsl:if>
       
-      <xsl:call-template name="blockComment">
-        <xsl:with-param name="content" select="'namespaces, implicit:'"/>
-      </xsl:call-template>
-      <!-- Generate a sequence of all the prefix-URI pairs that we
-           calculated in the 1st pass. For easy parsing later, we
-           separate each pair with a ‘␝’, which is a character we know
-           will never occur within either a namespace prefix or a
-           namespace URI (because it is not allowed in an xs:NCName,
-           and is not allowed in a URI (per RFC 3986), even though
-           xs:anyURI does not object to it). -->
+      <!-- To get implicit namespaces, start by generating a sequence
+           of all the prefix-URI pairs that we calculated in the 1st
+           pass. For easy parsing later, we separate each pair with a
+           ‘␝’, which is a character we know will never occur within
+           either a namespace prefix or a namespace URI (because it
+           is not allowed in an xs:NCName, and is not allowed in a URI
+           (per RFC 3986), even though xs:anyURI does not object to it). -->
       <xsl:variable name="allNSs" as="xs:string+">
         <xsl:sequence select="( $decorated//tei:*[@nsu]/concat( @nsp, '␝', @nsu ) )"/>
         <!-- if desired, other NSs can be added manually here -->
       </xsl:variable>
       <xsl:variable name="NSs" select="distinct-values( $allNSs )"/>
-      <!-- For each pair (except those that were empty — and thus are
-           now just a single ‘␝’ character — or those that are the XSL
-           namespace) ... -->
-      <xsl:for-each select="$NSs[ not( . eq '␝'  or  matches( ., '␝'||$xsl-ns||'$') ) ]">
-        <xsl:sort/>
-        <!-- ... parse out the prefix and the URI (using that never-occurs character) -->
-        <xsl:variable name="nsp" select="substring-before( .,':␝')"/>
-        <xsl:variable name="nsu" select="substring-after( .,'␝')"/>
-        <!-- Unless this same namespace was already output as "declared" ... -->
-        <xsl:if test="not( $decorated/key('DECLARED_NSs',1)[ @prefix eq $nsp  and  @uri eq $nsu ] )">
-          <!-- ... generate and output a Schematron declaration for it -->
-          <ns prefix="{$nsp}" uri="{$nsu}"/>
-        </xsl:if>
-      </xsl:for-each>
+      <!-- Weed out those that are empty — and thus are now just
+           a single ‘␝’ character — or those that are the XSL
+           namespace. (Not sure why we ditch those in the XSL
+           namespace. —Syd, 2024-10-23.) -->
+      <xsl:variable name="selected_NSs" select="$NSs[ not( . eq '␝'  or  matches( ., '␝'||$xsl-ns||'$') ) ]"/>
+      <!-- Look through that set of namespaces and generate <sch:ns> elements
+           for those that are not also explicitly declared (and thus already
+           put into output). -->
+      <xsl:variable name="not_declared_NSs" as="element(sch:ns)*">
+        <xsl:for-each select="$NSs[ not( . eq '␝'  or  matches( ., '␝'||$xsl-ns||'$') ) ]">
+          <xsl:sort/>
+          <!-- ... parse out the prefix and the URI (using that never-occurs character) -->
+          <xsl:variable name="nsp" select="substring-before( .,':␝')"/>
+          <xsl:variable name="nsu" select="substring-after( .,'␝')"/>
+          <!-- Unless this same namespace was already output as "declared" ... -->
+          <xsl:if test="not( key('DECLARED_NSs', ('*', $lang ), $decorated )[ @prefix eq $nsp  and  @uri eq $nsu ] )">
+            <!-- ... generate and output a Schematron declaration for it -->
+            <ns prefix="{$nsp}" uri="{$nsu}"/>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:if test="count( $not_declared_NSs ) gt 0">
+        <xsl:call-template name="blockComment">
+          <xsl:with-param name="content" select="'namespaces, implicit:'"/>
+        </xsl:call-template>
+        <xsl:copy-of select="$not_declared_NSs"/>
+      </xsl:if>
       
-      <xsl:if test="key('KEYs',1)">
+      <xsl:if test="key('KEYs', 1, $root )[ lang($lang) ]">
         <xsl:call-template name="blockComment">
           <xsl:with-param name="content" select="'keys:'"/>
         </xsl:call-template>
+        <xsl:for-each select="key('KEYs', 1, $root )[ lang($lang) ]">
+          <xsl:apply-templates select="."/>
+        </xsl:for-each>
       </xsl:if>
-      <xsl:for-each select="key('KEYs',1)">
-        <xsl:choose>
-          <xsl:when test="not( lang( $lang ) )"/>
-          <xsl:otherwise>
-            <xsl:apply-templates select="."/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
 
-      <xsl:if test="key('badKEYs',1)">
-        <xsl:message>WARNING: You have <xsl:value-of select="count(key('badKEYs',1))"/> &lt;key>
-          elements in the ISO Schematron namespace — but ISO Schematron does not have a &lt;key>
-          element, so they are being summarily ignored. This will likely result in an ISO Schematron
+      <xsl:if test="key('badKEYs', 1, $root )">
+        <xsl:message>WARNING: You have <xsl:value-of select="count( key('badKEYs', 1, $root) )"/> &lt;key> elements in the ISO Schematron
+          namespace — but ISO Schematron does not have a &lt;key> element, so they
+          are being summarily ignored. This will likely result in an ISO Schematron
           schema that does not perform the desired constraint tests properly.</xsl:message>
       </xsl:if>
 
-      <xsl:if test="$decorated//tei:constraintDecl[ @scheme eq 'schematron']">
+      <xsl:if test="$decorated//tei:constraintDecl[ @scheme eq 'schematron']/*[ not( self::sch:ns ) ]">
         <xsl:call-template name="blockComment">
           <xsl:with-param name="content" select="'declarations:'"/>
         </xsl:call-template>
@@ -310,54 +349,53 @@ of this software, even if advised of the possibility of such damage.
                              select="//tei:constraintDecl[ @scheme eq 'schematron']/*[not(self::sch:ns)]"/>
       </xsl:if>
       
-      <xsl:if test="key('CONSTRAINTs',1)">
+      <xsl:if test="key('CONSTRAINTs', $lang )">
+        <xsl:variable name="N" select="', of which there are '||count( key('CONSTRAINTs', $lang, $root ))"/>
         <xsl:call-template name="blockComment">
-          <xsl:with-param name="content" select="'constraints:'"/>
+          <xsl:with-param name="content" select="'constraints in '||$lang||$N"/>
         </xsl:call-template>
       </xsl:if>
-      <xsl:for-each select="key('CONSTRAINTs',1)">
+      <xsl:for-each select="$root/key('CONSTRAINTs', $lang )">
+        <xsl:variable name="patID" select="tei:makePatternID(.)"/>
         <xsl:choose>
-          <xsl:when test="not( lang( $lang ) )"/>
-          <xsl:otherwise>
-            <xsl:variable name="patID" select="tei:makePatternID(.)"/>
-            <xsl:choose>
-              <xsl:when test="sch:pattern">
-                <!-- IF there is a child <pattern>, we just copy over all children, no tweaking -->
-                <xsl:apply-templates select="node()">
-                  <!-- they all get handed $patID, but only the template for 'pattern' uses it -->
-                  <xsl:with-param name="patID" select="$patID"/>
-                </xsl:apply-templates>
-              </xsl:when>
-              <xsl:when test="sch:rule">
-                <!-- IF there is no <pattern>, but there is a <rule>, copy over all children -->
-                <!-- into a newly created <pattern> wrapper -->
-                <pattern id="{$patID}">
-                  <xsl:apply-templates select="node()"/>
-                </pattern>
-              </xsl:when>
-              <xsl:when test="sch:assert | sch:report | sch:extends">
-                <!-- IF there is no <pattern> nor <rule> child, but there is a child that -->
-                <!-- requires being wrapped in a rule, create both <rule> and <pattern> -->
-                <!-- wrappers for them, making HERE the context. -->
-                <pattern id="{$patID}">
-                  <rule context="{tei:generate-context(.)}">
-                    <xsl:apply-templates select="node()"/>
-                  </rule>
-                </pattern>
-              </xsl:when>
-              <xsl:otherwise>
-                <!-- IF there is neither a <pattern> nor a <rule>, nor a child that would -->
-                <!-- require being wrapped in those, just copy over whatever we have -->
+          <xsl:when test="sch:pattern">
+            <!-- IF there is a child <pattern>, we just copy over all children, no tweaking -->
+            <xsl:apply-templates select="node()">
+              <!-- they all get handed $patID, but only the template for 'pattern' uses it -->
+              <xsl:with-param name="patID" select="$patID"/>
+            </xsl:apply-templates>
+          </xsl:when>
+          <xsl:when test="sch:rule">
+            <!-- IF there is no <pattern>, but there is a <rule>, copy over all children -->
+            <!-- into a newly created <pattern> wrapper -->
+            <pattern id="{$patID}">
+              <xsl:apply-templates select="node()"/>
+            </pattern>
+          </xsl:when>
+          <xsl:when test="sch:assert | sch:report | sch:extends">
+            <!-- IF there is no <pattern> nor <rule> child, but there is a child that -->
+            <!-- requires being wrapped in a rule, create both <rule> and <pattern> -->
+            <!-- wrappers for them, making HERE the context.   NOTE: As of 2025-03-15 -->
+            <!-- a free-floating <assert> or <report> without a parent <rule> (with a -->
+            <!-- @context attribute) will no longer be allowed, so this entire <when> -->
+            <!-- could maybe be dropped.  See PR TEI #2513. -->
+            <pattern id="{$patID}">
+              <rule context="{tei:generate-context(.)}">
                 <xsl:apply-templates select="node()"/>
-              </xsl:otherwise>
-            </xsl:choose>
+              </rule>
+            </pattern>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- IF there is neither a <pattern> nor a <rule>, nor a child that would -->
+            <!-- require being wrapped in those, just copy over whatever we have -->
+            <xsl:apply-templates select="node()"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
 
       <xsl:if test="key('DEPRECATEDs',1)">
         <xsl:call-template name="blockComment">
-          <xsl:with-param name="content" select="'deprecated:'"/>
+          <xsl:with-param name="content" select="'deprecation tests:'"/>
         </xsl:call-template>
       </xsl:if>
       <!-- Things that can be deprecated: -->
@@ -441,11 +479,11 @@ of this software, even if advised of the possibility of such damage.
         <xsl:apply-templates select="$decorated//paramList"/>
       </xsl:if>
       
-      <xsl:if test="$decorated//sqf:fixes">
+      <xsl:if test="key('SCHQCKFIXs', $lang )">
         <xsl:call-template name="blockComment">
           <xsl:with-param name="content">schematron quick fixes:</xsl:with-param>
         </xsl:call-template>
-        <xsl:apply-templates select="$decorated//sqf:fixes" mode="copy"/>
+        <xsl:apply-templates select="key('SCHQCKFIXs', $lang )" mode="copy"/>
       </xsl:if>
 
     </schema>
@@ -461,10 +499,6 @@ of this software, even if advised of the possibility of such damage.
       </xsl:if>
       <xsl:apply-templates select="node()"/>
     </rule>
-  </xsl:template>
-  
-  <xsl:template match="@*|text()|comment()|processing-instruction()">
-    <xsl:copy/>
   </xsl:template>
   
   <xsl:template match="sch:*|xsl:*">
