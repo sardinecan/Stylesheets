@@ -358,7 +358,7 @@ of this software, even if advised of the possibility of such damage.
       <xsl:if test="key('CONSTRAINTs', $langs )">
         <xsl:variable name="N" select="', of which there are '||count( key('CONSTRAINTs', $langs, $root ))"/>
         <xsl:call-template name="blockComment">
-          <xsl:with-param name="content" select="'constraints in '||string-join( $langs, ',')||$N"/>
+          <xsl:with-param name="content" select="'constraints in '||string-join( $langs, ', ')||$N"/>
         </xsl:call-template>
       </xsl:if>
       <xsl:for-each select="$root/key('CONSTRAINTs', $langs )">
