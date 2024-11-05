@@ -2300,11 +2300,14 @@
         [  ],
         "content" : 
         [ 
-          { "type" : "ref" },
+          { "type" : "rng",
+            "rngContent" : "<ref xmlns=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:bar=\"http:\/\/blah.blah\/bar\" xmlns:blah=\"http:\/\/blah.blah\/blah\" xmlns:rng=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:teix=\"http:\/\/www.tei-c.org\/ns\/Examples\" name=\"ref\"\/>" },
           
-          { "type" : "oneOrMore" },
+          { "type" : "rng",
+            "rngContent" : "<oneOrMore xmlns=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:bar=\"http:\/\/blah.blah\/bar\" xmlns:blah=\"http:\/\/blah.blah\/blah\" xmlns:rng=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:teix=\"http:\/\/www.tei-c.org\/ns\/Examples\"><ref name=\"macro.specialPara\"\/><\/oneOrMore>" },
           
-          { "type" : "text" } ] },
+          { "type" : "rng",
+            "rngContent" : "<rng:text xmlns=\"http:\/\/www.tei-c.org\/ns\/1.0\" xmlns:bar=\"http:\/\/blah.blah\/bar\" xmlns:blah=\"http:\/\/blah.blah\/blah\" xmlns:rng=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:teix=\"http:\/\/www.tei-c.org\/ns\/Examples\"\/>" } ] },
       
       { "ident" : "cit",
         "ns" : "http:\/\/blah.blah\/bar",
@@ -2328,11 +2331,14 @@
         [  ],
         "content" : 
         [ 
-          { "type" : "ref" },
+          { "type" : "rng",
+            "rngContent" : "<ref xmlns=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:bar=\"http:\/\/blah.blah\/bar\" xmlns:blah=\"http:\/\/blah.blah\/blah\" xmlns:rng=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:teix=\"http:\/\/www.tei-c.org\/ns\/Examples\" name=\"ref\"\/>" },
           
-          { "type" : "oneOrMore" },
+          { "type" : "rng",
+            "rngContent" : "<oneOrMore xmlns=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:bar=\"http:\/\/blah.blah\/bar\" xmlns:blah=\"http:\/\/blah.blah\/blah\" xmlns:rng=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:teix=\"http:\/\/www.tei-c.org\/ns\/Examples\"><ref name=\"macro.specialPara\"\/><\/oneOrMore>" },
           
-          { "type" : "text" } ] },
+          { "type" : "rng",
+            "rngContent" : "<rng:text xmlns=\"http:\/\/www.tei-c.org\/ns\/1.0\" xmlns:bar=\"http:\/\/blah.blah\/bar\" xmlns:blah=\"http:\/\/blah.blah\/blah\" xmlns:rng=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:teix=\"http:\/\/www.tei-c.org\/ns\/Examples\"\/>" } ] },
       
       { "ident" : "citeData",
         "ns" : "http:\/\/foo.foo\/foo",
@@ -8983,11 +8989,14 @@
         [  ],
         "content" : 
         [ 
-          { "type" : "ref" },
+          { "type" : "rng",
+            "rngContent" : "<ref xmlns=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:bar=\"http:\/\/blah.blah\/bar\" xmlns:blah=\"http:\/\/blah.blah\/blah\" xmlns:rng=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:teix=\"http:\/\/www.tei-c.org\/ns\/Examples\" name=\"ref\"\/>" },
           
-          { "type" : "oneOrMore" },
+          { "type" : "rng",
+            "rngContent" : "<oneOrMore xmlns=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:bar=\"http:\/\/blah.blah\/bar\" xmlns:blah=\"http:\/\/blah.blah\/blah\" xmlns:rng=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:teix=\"http:\/\/www.tei-c.org\/ns\/Examples\"><ref name=\"macro.specialPara\"\/><\/oneOrMore>" },
           
-          { "type" : "text" } ] },
+          { "type" : "rng",
+            "rngContent" : "<rng:text xmlns=\"http:\/\/www.tei-c.org\/ns\/1.0\" xmlns:bar=\"http:\/\/blah.blah\/bar\" xmlns:blah=\"http:\/\/blah.blah\/blah\" xmlns:rng=\"http:\/\/relaxng.org\/ns\/structure\/1.0\" xmlns:teix=\"http:\/\/www.tei-c.org\/ns\/Examples\"\/>" } ] },
       
       { "ident" : "quotation",
         "ns" : "http:\/\/foo.foo\/foo",
