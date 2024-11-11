@@ -162,7 +162,6 @@
             <moduleRef key="core" include="p title"/>
             <elementSpec ident="title" mode="change">
                <attList>
-                  <attDef ident="calendar" mode="delete"/>
                   <attDef ident="level" mode="delete"/>
                   <attDef ident="type" mode="delete"/>
                </attList>
