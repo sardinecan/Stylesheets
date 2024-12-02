@@ -134,7 +134,7 @@ of this software, even if advised of the possibility of such damage.
     <xsl:variable name="languages" select="distinct-values( //@xml:lang )"/>
     <xsl:variable name="constraint_languages" as="xs:string*">
       <xsl:for-each select="key('CONSTRAINTs', $languages, $root ) | key('SCHQCKFIXs', $languages, $root )">
-        <xsl:sequence select="( ./ancestor-or-self::*[@xml:lang][1]/@xml:lang, 'en')[1] "/>
+        <xsl:sequence select="( ./ancestor-or-self::*[@xml:lang][1]/@xml:lang, 'en')[1]"/>
       </xsl:for-each>
     </xsl:variable>
     <xsl:variable name="distinct_constraint_languages" select="distinct-values( $constraint_languages )"/>
@@ -155,6 +155,12 @@ of this software, even if advised of the possibility of such damage.
       </xsl:otherwise>
     </xsl:choose>      
   </xsl:param>
+  <d:doc>
+    <d:desc>“langs” is the set of languages that should be extracted. It is a parameter,
+    rather than a variable, for debugging. That said, it may be useful to some users to
+    specify multiple languages at times.</d:desc>
+  </d:doc>
+  <xsl:param name="langs" select="( $lang, 'und', 'mul', 'zxx')" as="xs:string+"/>
   <d:doc>
     <d:desc>For the prefix for prefixes the default “esp” stands for
      “Extract Schematron Prefix”. Silly, I know, but my first thought
@@ -237,7 +243,7 @@ of this software, even if advised of the possibility of such damage.
       </xsl:variable>
       <xsl:attribute name="nsp">
         <xsl:variable name="DECLARED_NSs_with_this_uri" as="element(sch:ns)*"
-                      select="key('DECLARED_NSs', ( '*', $lang ), $root )[@uri eq $nsu]"/>
+                      select="key('DECLARED_NSs', ( '*', $langs ), $root )[@uri eq $nsu]"/>
         <xsl:choose>
           <xsl:when test="$nsu eq ''"/>
           <xsl:when test="$nsu eq $tei-ns">tei:</xsl:when>
@@ -276,11 +282,11 @@ of this software, even if advised of the possibility of such damage.
       <title>ISO Schematron rules</title>
       <xsl:comment> This file generated <xsl:sequence select="tei:whatsTheDate()"/> by 'extract-isosch.xsl'. </xsl:comment>
 
-      <xsl:if test="key('DECLARED_NSs', ( '*', $lang ), $root )[ not( @prefix eq 'xsl') ]">
+      <xsl:if test="key('DECLARED_NSs', ( '*', $langs ), $root )[ not( @prefix eq 'xsl') ]">
         <xsl:call-template name="blockComment">
           <xsl:with-param name="content" select="'namespaces, declared:'"/>
         </xsl:call-template>
-        <xsl:for-each select="key('DECLARED_NSs', ( '*', $lang ), $root )[ not( @prefix eq 'xsl') ]">
+        <xsl:for-each select="key('DECLARED_NSs', ( '*', $langs ), $root )[ not( @prefix eq 'xsl') ]">
           <ns><xsl:apply-templates select="@*|node()" mode="copy"/></ns>
         </xsl:for-each>
       </xsl:if>
@@ -312,7 +318,7 @@ of this software, even if advised of the possibility of such damage.
           <xsl:variable name="nsp" select="substring-before( .,':␝')"/>
           <xsl:variable name="nsu" select="substring-after( .,'␝')"/>
           <!-- Unless this same namespace was already output as "declared" ... -->
-          <xsl:if test="not( key('DECLARED_NSs', ('*', $lang ), $decorated )[ @prefix eq $nsp  and  @uri eq $nsu ] )">
+          <xsl:if test="not( key('DECLARED_NSs', ('*', $langs ), $decorated )[ @prefix eq $nsp  and  @uri eq $nsu ] )">
             <!-- ... generate and output a Schematron declaration for it -->
             <ns prefix="{$nsp}" uri="{$nsu}"/>
           </xsl:if>
@@ -325,11 +331,11 @@ of this software, even if advised of the possibility of such damage.
         <xsl:copy-of select="$not_declared_NSs"/>
       </xsl:if>
       
-      <xsl:if test="key('KEYs', 1, $root )[ lang($lang) ]">
+      <xsl:if test="key('KEYs', 1, $root )[ ( for $L in $langs return lang($L) ) = true() ]">
         <xsl:call-template name="blockComment">
           <xsl:with-param name="content" select="'keys:'"/>
         </xsl:call-template>
-        <xsl:for-each select="key('KEYs', 1, $root )[ lang($lang) ]">
+        <xsl:for-each select="key('KEYs', 1, $root )[ ( for $L in $langs return lang($L) ) = true() ]">
           <xsl:apply-templates select="."/>
         </xsl:for-each>
       </xsl:if>
@@ -349,13 +355,13 @@ of this software, even if advised of the possibility of such damage.
                              select="//tei:constraintDecl[ @scheme eq 'schematron']/*[not(self::sch:ns)]"/>
       </xsl:if>
       
-      <xsl:if test="key('CONSTRAINTs', $lang )">
-        <xsl:variable name="N" select="', of which there are '||count( key('CONSTRAINTs', $lang, $root ))"/>
+      <xsl:if test="key('CONSTRAINTs', $langs )">
+        <xsl:variable name="N" select="', of which there are '||count( key('CONSTRAINTs', $langs, $root ))"/>
         <xsl:call-template name="blockComment">
-          <xsl:with-param name="content" select="'constraints in '||$lang||$N"/>
+          <xsl:with-param name="content" select="'constraints in '||string-join( $langs, ', ')||$N"/>
         </xsl:call-template>
       </xsl:if>
-      <xsl:for-each select="$root/key('CONSTRAINTs', $lang )">
+      <xsl:for-each select="$root/key('CONSTRAINTs', $langs )">
         <xsl:variable name="patID" select="tei:makePatternID(.)"/>
         <xsl:choose>
           <xsl:when test="sch:pattern">
@@ -479,11 +485,11 @@ of this software, even if advised of the possibility of such damage.
         <xsl:apply-templates select="$decorated//paramList"/>
       </xsl:if>
       
-      <xsl:if test="key('SCHQCKFIXs', $lang )">
+      <xsl:if test="key('SCHQCKFIXs', $langs )">
         <xsl:call-template name="blockComment">
           <xsl:with-param name="content">schematron quick fixes:</xsl:with-param>
         </xsl:call-template>
-        <xsl:apply-templates select="key('SCHQCKFIXs', $lang )" mode="copy"/>
+        <xsl:apply-templates select="key('SCHQCKFIXs', $langs )" mode="copy"/>
       </xsl:if>
 
     </schema>
