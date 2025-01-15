@@ -44,7 +44,7 @@
                 <note type="manuscriptologique"><xsl:apply-templates select="following::*[starts-with(., $call)][self::*:notesManuscr][1]/node()" mode="insert"/></note>
             </xsl:when>
             
-            <xsl:otherwise><xsl:apply-templates mode="teiCorpus"/></xsl:otherwise>
+            <xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
     
