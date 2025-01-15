@@ -33,7 +33,7 @@
             <xsl:when test="@rend='italic allcaps' or @rend='allcaps italic'">
                 <hi rend="underline"><xsl:value-of select="upper-case(normalize-space(.))"/></hi>
             </xsl:when>
-            <xsl:when test="@rend='allcaps'">
+            <xsl:when test="@rend='allcaps' or @rend='smallcaps'">
                 <xsl:value-of select="upper-case(normalize-space(.))"/>
             </xsl:when>
             <xsl:when test=".[@rend='superscript'][string-length(.) = 1][matches(., '[a-z]{1}')][normalize-space(.)=('a', 'b', 'c', 'd', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm')]">
