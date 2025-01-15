@@ -206,6 +206,14 @@
         </xsl:for-each>
     </xsl:function>
     
+    <xsl:template match="tei:body/descendant::tei:persName" mode="teiCorpus">
+        <persName ref=""><xsl:apply-templates select="node() | @*" mode="teiCorpus"/></persName>
+    </xsl:template>
+    
+    <xsl:template match="tei:body/descendant::tei:term" mode="teiCorpus">
+        <persName ref=""><xsl:apply-templates select="node() | @*" mode="teiCorpus"/></persName>
+    </xsl:template>
+    
     <xsl:function name="jd:formatNotes">
         <xsl:param name="rawNotes"/>
         <notes>
