@@ -98,7 +98,7 @@
                                 <fileDesc>
                                     <titleStmt>
                                         <title><!-- ... --></title>
-                                        <xsl:apply-templates select="jd:responsabilities(current-group()[self::tei:resp])" mode="teiCorpus"/>
+                                        <xsl:apply-templates select="jd:responsabilities(current-group()[self::tei:resp][1])" mode="teiCorpus"/>
                                         <!--<xsl:value-of select="foo:responsability(current-group()[self::tei:resp])"/>-->
                                     </titleStmt>
                                     <publicationStmt>
