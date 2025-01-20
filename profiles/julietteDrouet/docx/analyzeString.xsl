@@ -28,7 +28,7 @@
             <xsl:apply-templates select="$gap" mode="unclear"/>
         </xsl:variable>
         <xsl:variable name="supplied">
-            <xsl:apply-templates select="$gap" mode="supplied"/>
+            <xsl:apply-templates select="$unclear" mode="supplied"/>
         </xsl:variable>
         <xsl:variable name="notesManuscr">
             <xsl:apply-templates select="$supplied" mode="notesManuscr"/>

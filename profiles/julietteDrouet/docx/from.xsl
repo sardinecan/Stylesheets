@@ -106,16 +106,23 @@
             <xsl:when test=".[normalize-space(.)='plusieurs lignes illisibles' or normalize-space(.)='plusieurs lignes illisibles.']">
                 <xsl:value-of select="."/>
             </xsl:when>
+            <xsl:when test=".[normalize-space(.)='?' or normalize-space(.)=' ?']">
+                <xsl:value-of select="normalize-space(.)" />
+            </xsl:when>
             <xsl:otherwise>
                 <hi rend="underline"><xsl:apply-templates mode="pass2"/></hi>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
-    <xsl:template match="*[not(self::tei:hi)][@rend[. = 'italic']]" mode="pass2">
-        <xsl:attribute name="rend" select="'underline'"/>
+
+    <xsl:template match="tei:hi[@rend='baseline']" mode="pass2">
+        <xsl:apply-templates select="node()" mode="pass2"/>
     </xsl:template>
     
+    <xsl:template match="*[not(self::tei:hi)]/@rend[. = 'italic']" mode="pass2">
+        <xsl:attribute name="rend" select="'underline'"/>
+    </xsl:template>
+
     <!--<xsl:template match="tei:resp" mode="pass2">
         <resp><xsl:value-of select="normalize-space(.)"/></resp>
         <xsl:if test="descendant::tei:pb"><pb/></xsl:if>

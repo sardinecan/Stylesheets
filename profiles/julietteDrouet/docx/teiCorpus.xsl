@@ -62,7 +62,6 @@
                 <fileDesc>
                     <titleStmt>
                         <title>title of corpus</title>
-                        <author>author</author>
                     </titleStmt>
                     <publicationStmt>
                         <p>Publication Information</p>
@@ -78,7 +77,6 @@
                         <fileDesc>
                             <titleStmt>
                                 <title>title of corpus</title>
-                                <author>author</author>
                             </titleStmt>
                             <publicationStmt>
                                 <p>Publication Information</p>
@@ -87,8 +85,14 @@
                                 <p>Information about the source</p>
                             </sourceDesc>
                         </fileDesc>
+                        <profileDesc>
+                            <langUsage>
+                                <language ident="fre">Français</language>
+                            </langUsage>
+                            <textClass></textClass>
+                        </profileDesc>
                     </teiHeader>
-                    <xsl:for-each-group select="current-group()" group-starting-with="tei:opener">
+                    <xsl:for-each-group select="current-group()" group-starting-with="tei:dateline">
                         <TEI>
                             <teiHeader>
                                 <fileDesc>

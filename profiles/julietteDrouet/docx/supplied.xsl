@@ -18,7 +18,7 @@
         </xsl:copy>
     </xsl:template>
     
-    <xsl:template match="text()" mode="supplied">
+    <xsl:template match="text()[not(ancestor::tei:note)]" mode="supplied">
         <xsl:variable name="supplied" as="xs:string" expand-text="no">\[([^\]]*)\]</xsl:variable>
         <xsl:analyze-string select="." regex="{$supplied}">
             <xsl:matching-substring><supplied><xsl:value-of select="regex-group(1)"/></supplied></xsl:matching-substring>
