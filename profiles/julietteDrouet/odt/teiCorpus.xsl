@@ -215,7 +215,7 @@
     </xsl:template>
     
     <xsl:template match="tei:body/descendant::tei:term" mode="teiCorpus">
-        <persName ref=""><xsl:apply-templates select="node() | @*" mode="teiCorpus"/></persName>
+        <term ref=""><xsl:apply-templates select="node() | @*" mode="teiCorpus"/></term>
     </xsl:template>
     
     <xsl:function name="jd:formatNotes">
