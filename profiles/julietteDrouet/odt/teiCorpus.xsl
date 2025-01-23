@@ -217,7 +217,9 @@
     <xsl:template match="tei:body/descendant::tei:term" mode="teiCorpus">
         <term ref=""><xsl:apply-templates select="node() | @*" mode="teiCorpus"/></term>
     </xsl:template>
-    
+
+    <xsl:template match="tei:p[tei:pb][normalize-space(.)='']" mode="teiCorpus"/>
+
     <xsl:function name="jd:formatNotes">
         <xsl:param name="rawNotes"/>
         <notes>
