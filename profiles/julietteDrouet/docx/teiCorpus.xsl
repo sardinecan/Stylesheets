@@ -7,27 +7,21 @@
     xmlns="http://www.tei-c.org/ns/1.0"
     exclude-result-prefixes="xs math tei"
     version="3.0">
-    
+
     <xsl:output method="xml" indent="true" encoding="UTF-8" />
-    <!-- @todo
-        smallcaps => Majuscule
-    -->
+
     <xsl:template match="node() | @*" mode="teiCorpus">
         <xsl:copy>
             <xsl:apply-templates select="node() | @*" mode="teiCorpus"/>
         </xsl:copy>
     </xsl:template>
-    
+
     <!--<xsl:template match="tei:p[jd:separator]"/>-->
     <xsl:template match="@xml:space" mode="teiCorpus"/>
     <xsl:template match="tei:resp[not(ancestor::tei:respStmt)]" mode="teiCorpus"/>
     <xsl:template match="tei:lieuConservation" mode="teiCorpus"/>
     <xsl:template match="tei:sourcesImprimees" mode="teiCorpus"/>
-    <xsl:template match="tei:notesManuscr" mode="teiCorpus"/>
-    <xsl:template match="tei:notesManuscr" mode="insert">
-        <xsl:apply-templates/>
-    </xsl:template>
-    
+
     <xsl:template match="tei:hi[not(ancestor::tei:note)]" mode="teiCorpus">
         <xsl:choose>
             <xsl:when test="@rend='italic allcaps' or @rend='allcaps italic'">
@@ -36,26 +30,14 @@
             <xsl:when test="@rend='allcaps' or @rend='smallcaps'">
                 <xsl:value-of select="upper-case(normalize-space(.))"/>
             </xsl:when>
-            <xsl:when test=".[@rend='superscript'][string-length(.) = 1][matches(., '[a-z]{1}')][normalize-space(.)=('a', 'b', 'c', 'd', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm')]">
-                <!--<xsl:variable name="notes" select="tei:formatNotes(ancestor::*:div[@type='letter']//*:p[last()])"/>-->
-                <xsl:variable name="call" select="normalize-space(.)"/>
-                <!--<xsl:variable name="notes" select="tei:formatNotes(following::*:notesMascrupt[1][starts-with(., $call)])"/>-->
-                <!--<note type="manuscriptologique"><xsl:apply-templates select="$notes//*:note[@key = $call]/node()"/></note>-->
-                <note type="manuscriptologique"><xsl:apply-templates select="following::*[starts-with(., $call)][self::*:notesManuscr][1]/node()" mode="insert"/></note>
-            </xsl:when>
-            
             <xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
     <xsl:template match="tei:hi[@rend='underline'][ancestor::tei:note]" mode="teiCorpus">
         <emph><xsl:apply-templates mode="teiCorpus"/></emph>
     </xsl:template>
-    
-    <xsl:template match="tei:notesManuscr/text()[1]" mode="insert">
-        <xsl:value-of select="normalize-space(substring(., 3))"/>
-    </xsl:template>
-    
+
     <xsl:template match="/" mode="teiCorpus">
         <teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
             <teiHeader>
@@ -72,7 +54,8 @@
                 </fileDesc>
             </teiHeader>
             <xsl:for-each-group select=".//tei:body/*" group-ending-with="*[tei:pb]">
-                <teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
+                <xsl:variable name="corpusID" select="'jd.entry.' || generate-id(.)" />
+                <teiCorpus xml:id="{$corpusID}">
                     <teiHeader>
                         <fileDesc>
                             <titleStmt>
@@ -93,7 +76,8 @@
                         </profileDesc>
                     </teiHeader>
                     <xsl:for-each-group select="current-group()" group-starting-with="*:dateline | *:opener">
-                        <TEI>
+                        <xsl:variable name="position" select="format-number(position(), '00')"/>
+                        <TEI xml:id="{$corpusID || '.' || $position}">
                             <teiHeader>
                                 <fileDesc>
                                     <titleStmt>

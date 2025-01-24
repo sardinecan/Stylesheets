@@ -8,6 +8,7 @@
     exclude-result-prefixes="xs math tei"
     version="3.0">
     
+    <xsl:template match="@xml:space" mode="specialChars"/>
     <xsl:template match="/" mode="specialChars">
         <xsl:apply-templates mode="specialChars"/>
     </xsl:template>
