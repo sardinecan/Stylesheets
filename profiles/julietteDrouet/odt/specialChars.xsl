@@ -7,17 +7,19 @@
     xmlns="http://www.tei-c.org/ns/1.0"
     exclude-result-prefixes="xs math tei"
     version="3.0">
-    
+
+    <xsl:template match="@xml:space" mode="specialChars"/>
+
     <xsl:template match="/" mode="specialChars">
         <xsl:apply-templates mode="specialChars"/>
     </xsl:template>
-    
+
     <xsl:template match="@* | node()" mode="specialChars">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()" mode="specialChars"/>
         </xsl:copy>
     </xsl:template>
-    
+
     <xsl:template match="text()" mode="specialChars">
         <xsl:variable name="half" as="xs:string" expand-text="no">1/2</xsl:variable>
         <xsl:analyze-string select="." regex="{$half}">

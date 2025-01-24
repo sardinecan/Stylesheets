@@ -18,6 +18,26 @@
         </xsl:copy>
     </xsl:template>
     
+    <xsl:template match="tei:p[@rend='notesManuscr']" mode="notesManuscr">
+        <xsl:comment><xsl:copy-of select="."/></xsl:comment>
+    </xsl:template>
+    <xsl:template match="tei:p[@rend='notesManuscr']" mode="insert">
+        <xsl:apply-templates/>
+    </xsl:template>
+
+    <xsl:template match="tei:p[@rend='notesManuscr']/text()[1]" mode="insert">
+        <xsl:value-of select="normalize-space(substring(., 3))"/>
+    </xsl:template>
+
+
+    <xsl:template match="tei:hi[@rend='superscript'][not(ancestor::tei:note)][string-length(normalize-space(.)) = 1][matches(., '[a-z]{1}')][normalize-space(.)=('a', 'b', 'c', 'd', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm')]" mode="notesManuscr">
+        <!--<xsl:variable name="notes" select="tei:formatNotes(ancestor::*:div[@type='letter']//*:p[last()])"/>-->
+        <xsl:variable name="call" select="normalize-space(.)"/>
+        <!--<xsl:variable name="notes" select="tei:formatNotes(following::*:notesMascrupt[1][starts-with(., $call)])"/>-->
+        <!--<note type="manuscriptologique"><xsl:apply-templates select="$notes//*:note[@key = $call]/node()"/></note>-->
+        <note type="manuscriptologique"><xsl:apply-templates select="./ancestor::tei:body//tei:p[@rend='notesManuscr'][starts-with(normalize-space(.), $call)]/node()" mode="insert"/></note>
+    </xsl:template>
+
     <xsl:template match="text()" mode="notesManuscr">
         <xsl:variable name="noteManuscr" as="xs:string" expand-text="no">\{([^\}]*)\}</xsl:variable>
         <xsl:analyze-string select="." regex="{$noteManuscr}">
