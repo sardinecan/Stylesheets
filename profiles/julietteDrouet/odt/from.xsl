@@ -28,7 +28,7 @@
     <xsl:template match="@xml:space" mode="pass3"/>
     <xsl:template match="tei:p/@rend[lower-case(.) = 'normal']" mode="pass3"/>
     <xsl:template match="tei:p/@rend[lower-case(.) = 'justify']" mode="pass3"/>
-    <xsl:template match="@rend[. = end]" modes="pass3" />
+    <xsl:template match="@rend[. = end]" mode="pass3" />
 
     <xsl:template match="tei:dateline | tei:p[tei:date]" mode="pass3">
         <opener>

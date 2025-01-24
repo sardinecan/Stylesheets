@@ -56,15 +56,16 @@
                 of this software, even if advised of the possibility of such damage.
             </p>
             <p>Author: See AUTHORS</p>
-            
+
             <p>Copyright: 2013, TEI Consortium</p>
         </desc>
     </doc>
     <!-- import base conversion style -->
-    
+
     <xsl:import href="../../default/docx/from.xsl"/>
     <xsl:import href="teiCorpus.xsl"/>
     <xsl:import href="analyzeString.xsl"/>
+
     <xsl:template match="/" mode="pass2">
         <xsl:variable name="pass2">
             <xsl:apply-templates mode="pass2"/>
@@ -74,10 +75,11 @@
         </xsl:variable>
         <xsl:apply-templates select="$teiCorpus" mode="analyzeString"/>
     </xsl:template>
-    
+
     <xsl:template match="@style" mode="pass2"/>
     <xsl:template match="@xml:space" mode="pass2"/>
     <xsl:template match="tei:p/@rend[lower-case(.) = 'normal']" mode="pass2"/>
+
     <xsl:template match="tei:dateline" mode="pass2">
         <opener>
             <xsl:copy>
@@ -85,40 +87,53 @@
             </xsl:copy>
         </opener>
     </xsl:template>
+
     <xsl:template match="tei:hi[not(@rend)]" mode="pass2">
         <xsl:apply-templates select="node()" mode="pass2"/>
     </xsl:template>
-    
+
+    <xsl:template match="tei:hi[@rend]" mode="pass2">
+        <xsl:call-template name="process-rend">
+            <xsl:with-param name="rend-values" select="tokenize(@rend, ' ')"/>
+            <xsl:with-param name="content" select="node()"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- Processus récursif pour imbriquer les balises hi -->
+    <xsl:template name="process-rend">
+        <xsl:param name="rend-values"/>
+        <xsl:param name="content"/>
+        <xsl:choose>
+            <xsl:when test="count($rend-values) &gt; 0">
+                <xsl:variable name="current-rend" select="$rend-values[1]"/>
+                <xsl:variable name="remaining-rend" select="subsequence($rend-values, 2)"/>
+                <hi>
+                    <xsl:attribute name="rend">
+                        <xsl:value-of select="$current-rend"/>
+                    </xsl:attribute>
+                    <xsl:call-template name="process-rend">
+                        <xsl:with-param name="rend-values" select="$remaining-rend"/>
+                        <xsl:with-param name="content" select="$content"/>
+                    </xsl:call-template>
+                </hi>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- Copie les nœuds enfants -->
+                <xsl:apply-templates select="$content" mode="pass2"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template match="tei:seg[@rend]" mode="pass2">
         <hi>
             <xsl:apply-templates select="node() | @*" mode="pass2"/>
         </hi>
     </xsl:template>
-    
-    <xsl:template match="tei:hi[@rend[. = 'italic']]" mode="pass2">
-        <xsl:choose>
-            <xsl:when test=".[normalize-space(.)='illis.' or normalize-space(.)='illis']">
-                <xsl:value-of select="."/>
-            </xsl:when>
-            <xsl:when test=".[normalize-space(.)='plusieurs mots illisibles' or normalize-space(.)='plusieurs mots illisibles.']">
-                <xsl:value-of select="."/>
-            </xsl:when>
-            <xsl:when test=".[normalize-space(.)='plusieurs lignes illisibles' or normalize-space(.)='plusieurs lignes illisibles.']">
-                <xsl:value-of select="."/>
-            </xsl:when>
-            <xsl:when test=".[normalize-space(.)='?' or normalize-space(.)=' ?']">
-                <xsl:value-of select="normalize-space(.)" />
-            </xsl:when>
-            <xsl:otherwise>
-                <hi rend="underline"><xsl:apply-templates mode="pass2"/></hi>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
 
     <xsl:template match="tei:hi[@rend='baseline']" mode="pass2">
         <xsl:apply-templates select="node()" mode="pass2"/>
     </xsl:template>
-    
+
     <xsl:template match="*[not(self::tei:hi)]/@rend[. = 'italic']" mode="pass2">
         <xsl:attribute name="rend" select="'underline'"/>
     </xsl:template>
@@ -127,11 +142,11 @@
         <resp><xsl:value-of select="normalize-space(.)"/></resp>
         <xsl:if test="descendant::tei:pb"><pb/></xsl:if>
     </xsl:template>
-    
+
     <xsl:template match="tei:repository" mode="pass2">
         <repository><xsl:value-of select="normalize-space(.)"/></repository>
     </xsl:template>-->
-    
+
     <xsl:template match="tei:note[@place='foot']" mode="pass2">
         <note type="footnote"><xsl:apply-templates select="tei:p/node()" mode="pass2"/></note>
     </xsl:template>

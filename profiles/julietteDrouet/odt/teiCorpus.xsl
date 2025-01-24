@@ -23,13 +23,29 @@
     <xsl:template match="tei:p[@rend='lieuConservation']" mode="teiCorpus"/>
     <xsl:template match="tei:p[@rend='sourcesImprimees']" mode="teiCorpus"/>
 
-    <xsl:template match="tei:hi[@rend='italic']" mode="teiCorpus">
+    <xsl:template match="tei:hi[@rend[. = 'italic']]" mode="teiCorpus">
         <xsl:choose>
             <xsl:when test="ancestor::tei:note">
-                <emph><xsl:apply-templates mode="teiCorpus"/></emph>
+                <emph><xsl:apply-templates mode="teiCorpus" /></emph>
             </xsl:when>
             <xsl:otherwise>
-                <hi rend="underline"><xsl:apply-templates mode="teiCorpus"/></hi>
+                <xsl:choose>
+                    <xsl:when test=".[normalize-space(.)='illis.' or normalize-space(.)='illis']">
+                        <xsl:value-of select="."/>
+                    </xsl:when>
+                    <xsl:when test=".[normalize-space(.)='plusieurs mots illisibles' or normalize-space(.)='plusieurs mots illisibles.']">
+                        <xsl:value-of select="."/>
+                    </xsl:when>
+                    <xsl:when test=".[normalize-space(.)='plusieurs lignes illisibles' or normalize-space(.)='plusieurs lignes illisibles.']">
+                        <xsl:value-of select="."/>
+                    </xsl:when>
+                    <xsl:when test=".[normalize-space(.)='?' or normalize-space(.)=' ?'] or normalize-space(.)=' '">
+                        <xsl:value-of select="normalize-space(.)" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <hi rend="underline"><xsl:apply-templates mode="teiCorpus"/></hi>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

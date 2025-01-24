@@ -22,7 +22,34 @@
     <xsl:template match="tei:lieuConservation" mode="teiCorpus"/>
     <xsl:template match="tei:sourcesImprimees" mode="teiCorpus"/>
 
-    <xsl:template match="tei:hi[not(ancestor::tei:note)]" mode="teiCorpus">
+    <xsl:template match="tei:hi[@rend[. = 'italic']]" mode="teiCorpus">
+        <xsl:choose>
+            <xsl:when test="ancestor::tei:note">
+                <emph><xsl:apply-templates mode="teiCorpus" /></emph>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:choose>
+                    <xsl:when test=".[normalize-space(.)='illis.' or normalize-space(.)='illis']">
+                        <xsl:value-of select="."/>
+                    </xsl:when>
+                    <xsl:when test=".[normalize-space(.)='plusieurs mots illisibles' or normalize-space(.)='plusieurs mots illisibles.']">
+                        <xsl:value-of select="."/>
+                    </xsl:when>
+                    <xsl:when test=".[normalize-space(.)='plusieurs lignes illisibles' or normalize-space(.)='plusieurs lignes illisibles.']">
+                        <xsl:value-of select="."/>
+                    </xsl:when>
+                    <xsl:when test=".[normalize-space(.)='?' or normalize-space(.)=' ?'] or normalize-space(.)=' '">
+                        <xsl:value-of select="normalize-space(.)" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <hi rend="underline"><xsl:apply-templates mode="teiCorpus"/></hi>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <!--<xsl:template match="tei:hi[not(ancestor::tei:note)]" mode="teiCorpus">
         <xsl:choose>
             <xsl:when test="@rend='italic allcaps' or @rend='allcaps italic'">
                 <hi rend="underline"><xsl:value-of select="upper-case(normalize-space(.))"/></hi>
@@ -32,11 +59,22 @@
             </xsl:when>
             <xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
         </xsl:choose>
+    </xsl:template>-->
+
+    <xsl:template match="tei:hi[@rend='smallcaps' or @rend='allcaps']" mode="teiCorpus">
+        <xsl:apply-templates select="node()" mode="teiCorpus"/>
+    </xsl:template>
+    <xsl:template match="tei:hi[@rend='smallcaps' or @rend='allcaps']/descendant::text()" mode="teiCorpus">
+        <xsl:choose>
+            <xsl:when test="ancestor::tei:note">
+                <xsl:value-of select="."/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="upper-case(.)"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="tei:hi[@rend='underline'][ancestor::tei:note]" mode="teiCorpus">
-        <emph><xsl:apply-templates mode="teiCorpus"/></emph>
-    </xsl:template>
 
     <xsl:template match="/" mode="teiCorpus">
         <teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
