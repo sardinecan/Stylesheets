@@ -130,27 +130,14 @@
         </hi>
     </xsl:template>
 
-    <xsl:template match="tei:hi[@rend='baseline']" mode="pass2">
-        <xsl:apply-templates select="node()" mode="pass2"/>
-    </xsl:template>
-
     <xsl:template match="*[not(self::tei:hi)]/@rend[. = 'italic']" mode="pass2">
         <xsl:attribute name="rend" select="'underline'"/>
     </xsl:template>
 
-    <!--<xsl:template match="tei:resp" mode="pass2">
-        <resp><xsl:value-of select="normalize-space(.)"/></resp>
-        <xsl:if test="descendant::tei:pb"><pb/></xsl:if>
-    </xsl:template>
-
-    <xsl:template match="tei:repository" mode="pass2">
-        <repository><xsl:value-of select="normalize-space(.)"/></repository>
-    </xsl:template>-->
-
     <xsl:template match="tei:note[@place='foot']" mode="pass2">
         <note type="footnote"><xsl:apply-templates select="tei:p/node()" mode="pass2"/></note>
     </xsl:template>
-    
+
     <xsl:template match="tei:signed" mode="pass2">
         <closer>
             <xsl:copy>
@@ -158,7 +145,7 @@
             </xsl:copy>
         </closer>
     </xsl:template>
-    
+
     <xsl:template match="tei:g" mode="pass2">
         <xsl:choose>
             <xsl:when test="@n = '5b'"><xsl:text>[</xsl:text></xsl:when>
@@ -166,5 +153,5 @@
             <xsl:otherwise><xsl:apply-templates mode="pass2"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
 </xsl:stylesheet>

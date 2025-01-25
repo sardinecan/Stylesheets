@@ -9,9 +9,7 @@
     version="3.0">
 
     <xsl:output method="xml" indent="true" encoding="UTF-8" />
-    <!-- @todo
-        smallcaps => Majuscule
-    -->
+
     <xsl:template match="node() | @*" mode="teiCorpus">
         <xsl:copy>
             <xsl:apply-templates select="node() | @*" mode="teiCorpus"/>
@@ -64,18 +62,6 @@
             <xsl:otherwise><xsl:value-of select="upper-case(.)" /></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
-    <!--<xsl:template match="tei:hi[not(ancestor::tei:note)]" mode="teiCorpus">
-        <xsl:choose>
-            <xsl:when test="@rend='italic allcaps' or @rend='allcaps italic'">
-                <hi rend="underline"><xsl:value-of select="upper-case(normalize-space(.))"/></hi>
-            </xsl:when>
-            <xsl:when test="@rend='allcaps' or @rend='smallcaps'">
-                <xsl:value-of select="upper-case(normalize-space(.))"/>
-            </xsl:when>
-            <xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>-->
 
     <xsl:template match="tei:div[not(@type='letter')]" mode="pass2">
         <xsl:apply-templates select="./node()" mode="pass2"/>

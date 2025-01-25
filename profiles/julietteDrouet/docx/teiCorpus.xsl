@@ -49,21 +49,14 @@
         </xsl:choose>
     </xsl:template>
 
-    <!--<xsl:template match="tei:hi[not(ancestor::tei:note)]" mode="teiCorpus">
-        <xsl:choose>
-            <xsl:when test="@rend='italic allcaps' or @rend='allcaps italic'">
-                <hi rend="underline"><xsl:value-of select="upper-case(normalize-space(.))"/></hi>
-            </xsl:when>
-            <xsl:when test="@rend='allcaps' or @rend='smallcaps'">
-                <xsl:value-of select="upper-case(normalize-space(.))"/>
-            </xsl:when>
-            <xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>-->
+    <xsl:template match="tei:hi[@rend='baseline']" mode="teiCorpus">
+        <xsl:apply-templates select="node()" mode="teiCorpus"/>
+    </xsl:template>
 
     <xsl:template match="tei:hi[@rend='smallcaps' or @rend='allcaps']" mode="teiCorpus">
         <xsl:apply-templates select="node()" mode="teiCorpus"/>
     </xsl:template>
+
     <xsl:template match="tei:hi[@rend='smallcaps' or @rend='allcaps']/descendant::text()" mode="teiCorpus">
         <xsl:choose>
             <xsl:when test="ancestor::tei:note">
@@ -74,7 +67,6 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
 
     <xsl:template match="/" mode="teiCorpus">
         <teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
@@ -132,7 +124,6 @@
                                                 <repository>
                                                     <xsl:value-of select="current-group()[self::tei:lieuConservation]"/>
                                                 </repository>
-                                                
                                             </msIdentifier>
                                         </msDesc>
                                         <xsl:if test="current-group()[self::tei:sourcesImprimees]">
@@ -144,7 +135,7 @@
                                                             <bibl><xsl:value-of select="normalize-space(.)"/></bibl>
                                                         </xsl:for-each>
                                                     </xsl:matching-substring>
-                                                </xsl:analyze-string> 
+                                                </xsl:analyze-string>
                                             </listBibl>
                                         </xsl:if>
                                     </sourceDesc>
@@ -182,12 +173,12 @@
             </xsl:for-each-group>
         </teiCorpus>
     </xsl:template>
-    
+
     <xsl:function name="jd:responsabilities">
         <xsl:param name="resp"/>
         <xsl:variable name="completepattern">Transcription d[e|'|’]\s*(.+)\s+assisté(?:e)?(?:s)?\s+d[e|'|’]\s*(.+)</xsl:variable>
         <xsl:variable name="shortpattern">Transcription d[e|'|’]\s*(.+)</xsl:variable>
-        
+
         <xsl:analyze-string select="$resp" regex="{$completepattern}">
             <xsl:matching-substring>
                 <respStmt><resp>Transcription</resp><persName><xsl:value-of select="regex-group(1)"/></persName></respStmt>
@@ -202,7 +193,7 @@
             </xsl:non-matching-substring>
         </xsl:analyze-string>
     </xsl:function>
-    
+
     <xsl:function name="jd:responsability">
         <xsl:param name="resp"/>
         <xsl:variable name="completepattern">Transcription d[e|'|’]\s*(.+)\s+assisté(?:e)?(?:s)?\s+d[e|'|’]\s*(.+)</xsl:variable>
@@ -231,11 +222,11 @@
             </xsl:choose>
         </xsl:for-each>
     </xsl:function>
-    
+
     <xsl:template match="tei:body/descendant::tei:persName" mode="teiCorpus">
         <persName ref=""><xsl:apply-templates select="node() | @*" mode="teiCorpus"/></persName>
     </xsl:template>
-    
+
     <xsl:template match="tei:body/descendant::tei:term" mode="teiCorpus">
         <term ref=""><xsl:apply-templates select="node() | @*" mode="teiCorpus"/></term>
     </xsl:template>
@@ -277,5 +268,5 @@
             </xsl:for-each-group>
         </notes>
     </xsl:function>
-    
+
 </xsl:stylesheet>

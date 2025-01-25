@@ -28,7 +28,7 @@
     <xsl:template match="@xml:space" mode="pass3"/>
     <xsl:template match="tei:p/@rend[lower-case(.) = 'normal']" mode="pass3"/>
     <xsl:template match="tei:p/@rend[lower-case(.) = 'justify']" mode="pass3"/>
-    <xsl:template match="@rend[. = end]" mode="pass3" />
+    <xsl:template match="@rend[. = 'end']" mode="pass3" />
 
     <xsl:template match="tei:dateline | tei:p[tei:date]" mode="pass3">
         <opener>
@@ -70,7 +70,6 @@
                 </hi>
             </xsl:when>
             <xsl:otherwise>
-                <!-- Copie les nœuds enfants -->
                 <xsl:apply-templates select="$content" mode="pass3"/>
             </xsl:otherwise>
         </xsl:choose>
@@ -79,14 +78,7 @@
     <xsl:template match="*[not(self::tei:hi)]/@rend[. = 'italic']" mode="pass3">
         <xsl:attribute name="rend" select="'underline'"/>
     </xsl:template>
-    <!--<xsl:template match="tei:resp" mode="pass3">
-        <resp><xsl:value-of select="normalize-space(.)"/></resp>
-        <xsl:if test="descendant::tei:pb"><pb/></xsl:if>
-    </xsl:template>
-    
-    <xsl:template match="tei:repository" mode="pass3">
-        <repository><xsl:value-of select="normalize-space(.)"/></repository>
-    </xsl:template>-->
+
     <xsl:template match="tei:note[@place='foot']" mode="pass3">
         <note type="footnote">
             <xsl:apply-templates select="node()" mode="pass3"/>
