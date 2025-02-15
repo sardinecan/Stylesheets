@@ -51,6 +51,12 @@
         </xsl:call-template>
     </xsl:template>
 
+    <xsl:template match="tei:head" mode="pass3">
+        <p>
+            <xsl:apply-templates select="node() | @*" mode="pass3"/>
+        </p>
+    </xsl:template>
+
     <!-- Processus récursif pour imbriquer les balises hi -->
     <xsl:template name="process-rend">
         <xsl:param name="rend-values"/>
