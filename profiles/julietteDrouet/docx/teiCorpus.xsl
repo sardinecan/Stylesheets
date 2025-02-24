@@ -106,7 +106,9 @@
                             <langUsage>
                                 <language ident="fre">Français</language>
                             </langUsage>
-                            <textClass></textClass>
+                            <textClass>
+                                <xsl:text> </xsl:text>
+                            </textClass>
                         </profileDesc>
                     </teiHeader>
                     <xsl:for-each-group select="current-group()" group-starting-with="*:dateline | *:opener">
