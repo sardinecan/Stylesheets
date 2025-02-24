@@ -53,6 +53,10 @@
         <xsl:apply-templates select="node()" mode="teiCorpus"/>
     </xsl:template>
 
+    <xsl:template match="tei:hi[@rend='footnote_reference']" mode="teiCorpus">
+        <xsl:apply-templates select="node()" mode="teiCorpus"/>
+    </xsl:template>
+
     <xsl:template match="tei:hi[@rend='smallcaps' or @rend='allcaps']" mode="teiCorpus">
         <xsl:apply-templates select="node()" mode="teiCorpus"/>
     </xsl:template>
