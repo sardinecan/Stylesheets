@@ -21,6 +21,11 @@
     </xsl:template>
     
     <xsl:template match="/" mode="analyzeString">
+        <xsl:processing-instruction name="xml-model">
+            href="https://gitlab.huma-num.fr/ceen/juliette-drouet/model/-/blob/main/juliettedrouet.odd.rng?ref_type=heads"
+            type="application/xml"
+            schematypens="http://relaxng.org/ns/structure/1.0"
+        </xsl:processing-instruction>
         <xsl:variable name="gap">
             <xsl:apply-templates mode="gap"/>
         </xsl:variable>
