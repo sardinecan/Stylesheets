@@ -39,9 +39,11 @@
     </xsl:template>
 
     <xsl:template match="tei:seg[@rend]" mode="pass3">
-        <hi>
-            <xsl:apply-templates select="node() | @*" mode="pass3"/>
-        </hi>
+        <hi><xsl:apply-templates select="node() | @*" mode="pass3"/></hi>
+    </xsl:template>
+
+    <xsl:template match="tei:seg[normalize-space(.)=''][tei:g]" mode="pass3">
+        <xsl:apply-templates select="node()" mode="pass3"/>
     </xsl:template>
 
     <xsl:template match="tei:hi" mode="pass3">
@@ -101,15 +103,9 @@
 
     <xsl:template match="tei:g" mode="pass3">
         <xsl:choose>
-            <xsl:when test="@n = '5b'">
-                <xsl:text>[</xsl:text>
-            </xsl:when>
-            <xsl:when test="@n = '5d'">
-                <xsl:text>]</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:apply-templates mode="pass3"/>
-            </xsl:otherwise>
+            <xsl:when test="matches(@n, '5b', 'i')"><xsl:text>[</xsl:text></xsl:when>
+            <xsl:when test="matches(@n, '5d', 'i')"><xsl:text>]</xsl:text></xsl:when>
+            <xsl:otherwise><xsl:apply-templates mode="pass3"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>

@@ -72,6 +72,12 @@
         </xsl:choose>
     </xsl:template>
 
+    <xsl:template match="tei:dateline/tei:date[1]" mode="teiCorpus">
+        <date><xsl:copy-of select="./node() | ./following-sibling::tei:date/node()"/></date>
+    </xsl:template>
+
+    <xsl:template match="tei:dateline/tei:date[position() &gt; 1]" mode="teiCorpus"/>
+
     <xsl:template match="/" mode="teiCorpus">
         <teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
             <teiHeader>

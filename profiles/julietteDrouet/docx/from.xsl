@@ -130,6 +130,10 @@
         </hi>
     </xsl:template>
 
+    <xsl:template match="tei:seg[normalize-space(.)=''][tei:g]" mode="pass2">
+        <xsl:apply-templates select="node()" mode="pass2"/>
+    </xsl:template>
+
     <xsl:template match="*[not(self::tei:hi)]/@rend[. = 'italic']" mode="pass2">
         <xsl:attribute name="rend" select="'underline'"/>
     </xsl:template>
@@ -148,8 +152,8 @@
 
     <xsl:template match="tei:g" mode="pass2">
         <xsl:choose>
-            <xsl:when test="@n = '5b'"><xsl:text>[</xsl:text></xsl:when>
-            <xsl:when test="@n = '5d'"><xsl:text>]</xsl:text></xsl:when>
+            <xsl:when test="matches(@n, '5b', 'i')"><xsl:text>[</xsl:text></xsl:when>
+            <xsl:when test="matches(@n, '5d', 'i')"><xsl:text>]</xsl:text></xsl:when>
             <xsl:otherwise><xsl:apply-templates mode="pass2"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
