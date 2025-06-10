@@ -47,14 +47,18 @@
     </xsl:choose>
   </xsl:template>
 
+    <xsl:template match="div[@class='boite_remarque']">
+        <div type="remarque"><xsl:apply-templates/></div>
+    </xsl:template>
+
   <xsl:template match="div[@id = 'Page_content_goes_here']/table">
     <xsl:apply-templates/>
   </xsl:template>
 
   <xsl:template match="div[@id = 'Page_content_goes_here']/table/tr">
-    <div type="note" xml:id="{ $documentName || '.' || td[1]/a[not(following-sibling::*[1][self::em])]/@id }">
+    <note xml:id="{ $documentName || '.' || td[1]/a[not(following-sibling::*[1][self::em])]/@id }">
       <xsl:apply-templates/>
-    </div>
+    </note>
   </xsl:template>
 
   <xsl:template match="div[@id = 'Page_content_goes_here']/table/tr/td">
@@ -63,16 +67,31 @@
         <label><xsl:apply-templates /></label>
       </xsl:when>
       <xsl:otherwise>
-        <div type="noteContent">
           <p><xsl:apply-templates /></p>
-        </div>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="span[@class='italics']">
+  <xsl:template match="span[@class='italics'] | em">
     <emph><xsl:apply-templates /></emph>
   </xsl:template>
+    
+    <xsl:template match="img">
+        <figure>
+            <graphic url="{@src}" />
+            <xsl:if test="@alt">
+                <figDesc><xsl:value-of select="@alt"/></figDesc>
+            </xsl:if>if
+        </figure>
+    </xsl:template>
+    
+    <xsl:template match="ul">
+        <list><xsl:apply-templates/></list>
+    </xsl:template>
+    
+    <xsl:template match="li">
+        <item><xsl:apply-templates/></item>
+    </xsl:template>
 
   <xsl:template match="nav" />
   <xsl:template match="footer" />
