@@ -35,11 +35,17 @@
         <!--<xsl:variable name="notes" select="tei:formatNotes(following::*:notesMascrupt[1][starts-with(., $call)])"/>-->
         <!--<note type="manuscriptologique"><xsl:apply-templates select="$notes//*:note[@key = $call]/node()"/></note>-->
         <!--<note type="manuscriptologique"><xsl:apply-templates select="following::*[starts-with(., $call)][self::*:notesManuscr][1]/node()" mode="insert"/></note>-->
-
-        <note type="manuscriptologique"><xsl:apply-templates select="./ancestor::tei:body//*:notesManuscr[starts-with(., $call)]/node()" mode="insert"/></note>
+        <xsl:choose>
+            <xsl:when test="./ancestor::tei:body//*:notesManuscr[starts-with(., $call)]/node()">
+                <note type="manuscriptologique"><xsl:apply-templates select="./ancestor::tei:body//*:notesManuscr[starts-with(., $call)]/node()" mode="insert"/></note>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
-    
+
     <xsl:template match="text()" mode="notesManuscr">
         <xsl:variable name="noteManuscr" as="xs:string" expand-text="no">\{([^\}]*)\}</xsl:variable>
         <xsl:analyze-string select="." regex="{$noteManuscr}">

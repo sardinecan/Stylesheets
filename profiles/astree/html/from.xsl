@@ -19,6 +19,7 @@
   - span @class=first => idem aussi ?
   - span class="var_init" contenant une étoile *
   - span class="cache" avant les notes
+  - span class="erreur1610" voir (https://astree.univ-rouen.fr/_analyse/note_2.html#2_lacune) et II, 12, 804
 
   @todo vérifier les ancres => création d'ancres et de pb, qui sont aussi des ancres l'origine, mais utilisation de @n
   -->

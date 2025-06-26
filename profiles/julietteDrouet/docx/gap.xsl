@@ -28,13 +28,15 @@
                 <xsl:variable name="wordsGap" as="xs:string" expand-text="no">\[plusieurs mots illisibles\.?\]</xsl:variable>
                 <xsl:analyze-string select="." regex="{$wordsGap}">
                     <xsl:matching-substring>
-                        <gap extent="few words"/>
+                        <!--<gap extent="few words"/>-->
+                        <note type="editor">plusieurs mots illisibles.</note>
                     </xsl:matching-substring>
                     <xsl:non-matching-substring>
                         <xsl:variable name="linesGap" as="xs:string" expand-text="no">\[plusieurs lignes illisibles\.?\]</xsl:variable>
                         <xsl:analyze-string select="." regex="{$linesGap}">
                             <xsl:matching-substring>
-                                <gap extent="few lines"/>
+                                <!--<gap extent="few lines"/>-->
+                                <note type="editor">plusieurs lignes illisibles.</note>
                             </xsl:matching-substring>
                             <xsl:non-matching-substring>
                                 <xsl:value-of select="."/>

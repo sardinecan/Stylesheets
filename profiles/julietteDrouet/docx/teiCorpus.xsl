@@ -53,6 +53,10 @@
         <xsl:apply-templates select="node()" mode="teiCorpus"/>
     </xsl:template>
 
+    <xsl:template match="tei:hi[@rend='spip_surligne']" mode="teiCorpus">
+        <xsl:apply-templates select="node()" mode="teiCorpus"/>
+    </xsl:template>
+
     <xsl:template match="tei:hi[@rend='footnote_reference']" mode="teiCorpus">
         <xsl:apply-templates select="node()" mode="teiCorpus"/>
     </xsl:template>
@@ -83,7 +87,20 @@
             <teiHeader>
                 <fileDesc>
                     <titleStmt>
-                        <title>title of corpus</title>
+                        <title>Lettres de Juliette Drouet à Victor Hugo</title>
+                        <respStmt>
+                          <resp>Éditées par</resp>
+                          <persName>Florence Naugrette</persName>
+                        </respStmt>
+                        <respStmt>
+                            <resp>Rétroconversion docx vers XML-TEI</resp>
+                            <persName>Josselin Morvan</persName>
+                        </respStmt>
+                        <respStmt>
+                            <resp>Validation des fichiers XML-TEI</resp>
+                            <persName>Élisa Barthélemy</persName>
+                            <persName>Hélène Hôte</persName>
+                        </respStmt>
                     </titleStmt>
                     <publicationStmt>
                         <p>Publication Information</p>
@@ -93,13 +110,26 @@
                     </sourceDesc>
                 </fileDesc>
             </teiHeader>
-            <xsl:for-each-group select=".//tei:body/*" group-ending-with="tei:pb">
+            <xsl:for-each-group select=".//tei:body/*" group-ending-with="*:blop">
                 <xsl:variable name="corpusID" select="'jd.entry.' || generate-id(.)" />
                 <teiCorpus xml:id="{$corpusID}">
                     <teiHeader>
                         <fileDesc>
                             <titleStmt>
-                                <title>title of corpus</title>
+                                <title><xsl:value-of select="(current-group()/tei:dateline)[1]/string-join(tei:date)"/></title>
+                                <respStmt>
+                                    <resp>Éditées par</resp>
+                                    <persName>Florence Naugrette</persName>
+                                </respStmt>
+                                <respStmt>
+                                    <resp>Rétroconversion docx vers XML-TEI</resp>
+                                    <persName>Josselin Morvan</persName>
+                                </respStmt>
+                                <respStmt>
+                                    <resp>Validation des fichiers XML-TEI</resp>
+                                    <persName>Élisa Barthélemy</persName>
+                                    <persName>Hélène Hôte</persName>
+                                </respStmt>
                             </titleStmt>
                             <publicationStmt>
                                 <p>Publication Information</p>
@@ -123,7 +153,16 @@
                             <teiHeader>
                                 <fileDesc>
                                     <titleStmt>
-                                        <title><!-- ... --></title>
+                                        <title><xsl:value-of select="current-group()//tei:dateline/string-join(tei:date)"/></title>
+                                        <respStmt>
+                                            <resp>Rétroconversion docx vers XML-TEI</resp>
+                                            <persName>Josselin Morvan</persName>
+                                        </respStmt>
+                                        <respStmt>
+                                            <resp>Validation des fichiers XML-TEI</resp>
+                                            <persName>Élisa Barthélemy</persName>
+                                            <persName>Hélène Hôte</persName>
+                                        </respStmt>
                                         <xsl:apply-templates select="jd:responsabilities(current-group()[self::tei:resp][1])" mode="teiCorpus"/>
                                         <!--<xsl:value-of select="foo:responsability(current-group()[self::tei:resp])"/>-->
                                     </titleStmt>
@@ -243,7 +282,7 @@
         <term ref=""><xsl:apply-templates select="node() | @*" mode="teiCorpus"/></term>
     </xsl:template>
 
-    <xsl:template match="tei:p[tei:pb][normalize-space(.)='']" mode="teiCorpus"/>
+    <!--<xsl:template match="tei:p[tei:pb][normalize-space(.)='']" mode="teiCorpus"/>-->
 
     <xsl:function name="jd:formatNotes">
         <xsl:param name="rawNotes"/>

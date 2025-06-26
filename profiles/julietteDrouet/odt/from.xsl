@@ -30,7 +30,15 @@
     <xsl:template match="tei:p/@rend[lower-case(.) = 'justify']" mode="pass3"/>
     <xsl:template match="@rend[. = 'end']" mode="pass3" />
 
+    <xsl:template match="tei:p[tei:pb] | tei:notesManuscr" mode="pass3">
+        <blop/>
+        <xsl:copy-of select="."/>
+    </xsl:template>
+
     <xsl:template match="tei:dateline | tei:p[tei:date]" mode="pass3">
+        <xsl:if test="./descendant::tei:pb">
+            <blop/>
+        </xsl:if>
         <opener>
             <dateline>
                 <xsl:apply-templates select="node() | @*" mode="pass3"/>

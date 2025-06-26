@@ -76,13 +76,26 @@
         <xsl:apply-templates select="$teiCorpus" mode="analyzeString"/>
     </xsl:template>
 
-    <xsl:template match="@style" mode="pass2"/>
+    <xsl:template match="@style" mode="pass2">
+        <xsl:choose>
+            <xsl:when test="matches(., 'right')">
+                <xsl:attribute name="rend">right</xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise/>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template match="@xml:space" mode="pass2"/>
     <xsl:template match="tei:p/@rend[lower-case(.) = 'normal']" mode="pass2"/>
+
+    <xsl:template match="tei:p[normalize-space(.) = '@@@']" mode="pass2">
+        <blop/>
+    </xsl:template>
 
     <xsl:template match="tei:dateline" mode="pass2">
         <opener>
             <xsl:copy>
+                <xsl:attribute name="rend" select="'right'"/>
                 <xsl:apply-templates select="node() | @*" mode="pass2"/>
             </xsl:copy>
         </opener>
@@ -145,6 +158,7 @@
     <xsl:template match="tei:signed" mode="pass2">
         <closer>
             <xsl:copy>
+                <xsl:attribute name="rend" select="'right'"/>
                 <xsl:apply-templates select="node() | @*" mode="pass2"/>
             </xsl:copy>
         </closer>

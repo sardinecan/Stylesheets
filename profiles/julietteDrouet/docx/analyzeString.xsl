@@ -8,6 +8,7 @@
     exclude-result-prefixes="xs math tei"
     version="3.0">
     
+    <xsl:import href="blop.xsl"/>
     <xsl:import href="gap.xsl"/>
     <xsl:import href="unclear.xsl"/>
     <xsl:import href="supplied.xsl"/>
@@ -19,15 +20,20 @@
             <xsl:apply-templates select="@* | node()" mode="analyzeString"/>
         </xsl:copy>
     </xsl:template>
-    
+
     <xsl:template match="/" mode="analyzeString">
         <xsl:processing-instruction name="xml-model">
             href="https://gitlab.huma-num.fr/ceen/juliette-drouet/model/-/raw/main/juliettedrouet.odd.rng?ref_type=heads"
             type="application/xml"
             schematypens="http://relaxng.org/ns/structure/1.0"
         </xsl:processing-instruction>
+        
+        <xsl:variable name="blop">
+            <xsl:apply-templates mode="blop"/>
+        </xsl:variable>
+
         <xsl:variable name="gap">
-            <xsl:apply-templates mode="gap"/>
+            <xsl:apply-templates select="$blop" mode="gap"/>
         </xsl:variable>
         <xsl:variable name="unclear">
             <xsl:apply-templates select="$gap" mode="unclear"/>

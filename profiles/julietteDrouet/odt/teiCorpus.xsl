@@ -88,7 +88,7 @@
                     </sourceDesc>
                 </fileDesc>
             </teiHeader>
-            <xsl:for-each-group select=".//tei:body/*" group-ending-with="tei:pb">
+            <xsl:for-each-group select=".//tei:body/*" group-ending-with="*:blop">
                 <xsl:variable name="corpusID" select="'jd.entry.' || generate-id(.)" />
                 <teiCorpus xml:id="{$corpusID}">
                     <teiHeader>
