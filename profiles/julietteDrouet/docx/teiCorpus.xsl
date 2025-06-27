@@ -153,7 +153,7 @@
                             <teiHeader>
                                 <fileDesc>
                                     <titleStmt>
-                                        <title><xsl:value-of select="current-group()//tei:dateline/string-join(tei:date)"/></title>
+                                        <title><xsl:value-of select="current-group()//tei:dateline/normalize-space()"/></title>
                                         <respStmt>
                                             <resp>Rétroconversion docx vers XML-TEI</resp>
                                             <persName>Josselin Morvan</persName>
