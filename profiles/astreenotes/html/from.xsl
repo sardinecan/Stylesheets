@@ -3,7 +3,8 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns="http://www.tei-c.org/ns/1.0"
     xmlns:tei="http://www.tei-c.org/ns/1.0"
-    xmlns:m="http://www.w3.org/1998/Math/MathML" exclude-result-prefixes="tei xs m" version="3.0"
+    xmlns:foo="foo/bar"
+    exclude-result-prefixes="tei xs foo" version="3.0"
     xmlns:html="http://www.w3.org/1999/xhtml" xpath-default-namespace="http://www.w3.org/1999/xhtml">
 
   <xsl:output method="xml" indent="true" />
@@ -22,9 +23,6 @@
   @todo vérifier les ancres => création d'ancres et de pb, qui sont aussi des ancres l'origine, mais utilisation de @n
   -->
   <xsl:variable name="documentName" select="substring-before(tokenize(base-uri(), '/')[last()], '.')"/>
-  <xsl:template match="/">
-    <xsl:apply-templates />
-  </xsl:template>
 
    <xsl:template match="a[@class]">
     <xsl:choose>
@@ -75,20 +73,20 @@
   <xsl:template match="span[@class='italics'] | em">
     <emph><xsl:apply-templates /></emph>
   </xsl:template>
-    
+
     <xsl:template match="img">
         <figure>
             <graphic url="{@src}" />
             <xsl:if test="@alt">
                 <figDesc><xsl:value-of select="@alt"/></figDesc>
-            </xsl:if>if
+            </xsl:if>
         </figure>
     </xsl:template>
-    
+
     <xsl:template match="ul">
         <list><xsl:apply-templates/></list>
     </xsl:template>
-    
+
     <xsl:template match="li">
         <item><xsl:apply-templates/></item>
     </xsl:template>
